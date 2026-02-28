@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload File</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+
+</head>
+<body>
+  <h1>Upload a File</h1>
+    <input id = "uploadFile" type="file" name="file" required />
+    <button id="uploadButton" onclick="uploadFile()">Upload</button>
+    <script>
+    async function uploadFile() {
+      document.getElementById('uploadButton').disabled = true;
+      const fileInput = document.getElementById('uploadFile');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please select a file to upload.');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+      // lấy nhỏ theo byte
+      const chunkSize = 140 * 1024; // 140KB
+      const totalSize = file.size;
+      let start = 0;
+      const chunks = [];
+      const promises = [];
+      while (start < totalSize) {
+        chunks.push(file.slice(start, start + chunkSize));
+        start += chunkSize;
+      }
+      if (!chunks.length) {
+        alert('File is too small to upload.');
+        return;
+      }
+      const [fileName, fileExtension]= file.name.split('.');
+      for (let i = 0; i < chunks.length; i++) {
+        const chunkFormData = new FormData();
+        chunkFormData.append('chunkName', `${fileName}.part${i}`);
+        chunkFormData.append('chunk', chunks[i]);
+        promises.push(axios.post('http://localhost:3000/user/upload/large-file', chunkFormData));
+      }
+      await Promise.all(promises)
+      // sau khi upload xong thì reset lại input
+      fileInput.value = '';
+      document.getElementById('uploadButton').disabled = false;
+      // đồng thời gọi hàm merge để gộp các chunk lại thành file hoàn chỉnh
+      await axios.post('http://localhost:3000/user/merge', { fileName: fileName, fileExtension: fileExtension}).then(() => {
+        alert('File merged successfully');
+      });
+    }
+  </script>   
+</body> 
+</html>
