@@ -6,14 +6,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { storage } from './oss';
 import * as fs from 'fs';
 import * as path from 'path';
+import { MyLogger } from 'src/log/mylogger';
 
 
 @Controller('user')
 export class UserController {
+  private logger = new MyLogger();
   constructor(private readonly userService: UserService) {}
 
   @Post('new')
   register(@Body() registerUserDto: RegisterUserDto) {
+    this.logger.log('Registering user', 'UserController');
     console.log(registerUserDto);
     return this.userService.register(registerUserDto);
   }
