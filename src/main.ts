@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { MyLogger } from './log/mylogger';
 // import { NextFunction } from 'express';
 // import { TestGuardGuard } from './test-guard.guard';
 // import { TestTimeInterceptor } from './test-time.interceptor';
@@ -32,6 +33,8 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads',
   });
+  app.useLogger(new MyLogger());
   await app.listen(process.env.PORT ?? 3000);
+  console.log(`Server is running on http://localhost:${process.env.PORT ?? 3000}`);
 }
 bootstrap();
