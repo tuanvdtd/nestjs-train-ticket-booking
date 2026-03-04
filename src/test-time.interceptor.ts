@@ -10,7 +10,7 @@ import { map, Observable } from 'rxjs';
 export class TestTimeInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const startTime = Date.now();
-    console.log('3.TestTimeInterceptor is running');
+    // console.log('3.TestTimeInterceptor is running');
     return next.handle().pipe(
       // tap(() => {
       //   console.log(`Time exec: ${Date.now() - startTime}`);
