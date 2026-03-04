@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci && npm cache clean --force
 
 COPY . .
 
@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=build-step /app/dist ./dist
 COPY --from=build-step /app/package*.json ./
 
-RUN npm install --production
+RUN npm ci --only=production && npm cache clean --force
 
 EXPOSE 3000
 
