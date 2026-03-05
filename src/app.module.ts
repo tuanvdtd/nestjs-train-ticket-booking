@@ -6,9 +6,26 @@ import { TestMiddlewareMiddleware } from './test-middleware.middleware';
 import { TestGuardGuard } from './test-guard.guard';
 import { UserModule } from './user/user.module';
 import { DbModule } from './db/db.module';
+import { StockTestTypeormModule } from './stock-test-typeorm/stock-test-typeorm.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { StockTestTypeorm } from './stock-test-typeorm/entities/stock-test-typeorm.entity';
 
 @Module({
-  imports: [OrderModule, UserModule, DbModule],
+  imports: [
+    OrderModule, UserModule, DbModule, StockTestTypeormModule,
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '123456',
+      database: 'test-typeorm',
+      entities: [StockTestTypeorm],
+      synchronize: true,
+      logging: true,
+      migrations: []
+    })
+  ],
   controllers: [AppController],
   providers: [
     AppService,

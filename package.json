@@ -8,8 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "dev": "set NODE_OPTIONS=--openssl-legacy-provider && nest start",
-    "wdev": "set NODE_OPTIONS=--openssl-legacy-provider && nest start --watch",
+    "dev": "nest start",
+    "wdev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -24,13 +24,16 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/typeorm": "^11.0.0",
     "chalk": "^5.6.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.4",
     "dayjs": "^1.11.19",
     "multer": "^2.0.2",
+    "mysql2": "^3.18.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "typeorm": "^0.3.28",
     "winston": "^3.19.0"
   },
   "devDependencies": {
