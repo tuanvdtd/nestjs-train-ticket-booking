@@ -6,3 +6,20 @@ services:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: train_ticket
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-train-ticket-booking
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_NAME: train_ticket
