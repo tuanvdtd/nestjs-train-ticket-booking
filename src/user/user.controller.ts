@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UploadedFile, UseInterceptors, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -7,6 +7,7 @@ import { storage } from './oss';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MyLogger } from 'src/log/mylogger';
+import { LoginGuard } from './login.guard';
 
 
 @Controller('user')
@@ -14,12 +15,31 @@ export class UserController {
   private logger = new MyLogger();
   constructor(private readonly userService: UserService) {}
 
-  @Post('new')
+  @Post('register')
   register(@Body() registerUserDto: RegisterUserDto) {
     this.logger.log('Registering user', 'UserController');
     console.log(registerUserDto);
     return this.userService.register(registerUserDto);
   }
+
+  //login
+  @Post('login')
+  login(@Body() loginUserDto: LoginUserDto) {
+    this.logger.log('User login attempt', 'UserController');
+    console.log(loginUserDto);
+    return this.userService.login(loginUserDto);
+  }
+
+  //profile
+  @UseGuards(LoginGuard)
+  @Get('profile')
+  getProfile(@Req() req: Request) {
+    const userId = req['user'].userId;
+    this.logger.log(`Getting profile for user with id: ${userId}`, 'UserController');
+    return this.userService.getProfile(userId);
+  }
+
+
 
   @Post('upload/avatar')
   @UseInterceptors(FileInterceptor('file', {
@@ -137,12 +157,6 @@ export class UserController {
       message: 'File merged successfully',
       path: outputPath
     };
-  }
-
-  @Post('login')
-  login(@Body() loginUserDto: LoginUserDto) {
-    console.log(loginUserDto);
-    return this.userService.login(loginUserDto);
   }
 
   @Get()

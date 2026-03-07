@@ -1,11 +1,17 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { DbService } from 'src/db/db.service';
+// import { DbService } from 'src/db/db.service';
 import { User } from './entities/user.entity';
 import { LoginUserDto } from './dto/login-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { LoginUserVo } from './vo/login.vo';
 
 @Injectable()
 export class UserService {
+/*
   @Inject(DbService)
   private dbService: DbService;
 
@@ -35,6 +41,51 @@ export class UserService {
       throw new BadRequestException('Login failed');
     }
     return user;
+  }
+*/
+  @InjectRepository(User)
+  private userRepository: Repository<User>;
+  @Inject(JwtService)
+  private jwtService: JwtService;
+
+  async register(registerUserDto: RegisterUserDto) : Promise<User> {
+    const existingUser = await this.userRepository.findOne({ where: { username: registerUserDto.username } });
+    if (existingUser) {
+      throw new BadRequestException('User already exists');
+    }
+    const newUser = new User();
+    newUser.password = await bcrypt.hash(registerUserDto.password, 10);
+    newUser.username = registerUserDto.username;
+    newUser.email = registerUserDto.email;
+    return this.userRepository.save(newUser);
+  }
+
+  async login(loginUserDto: LoginUserDto) : Promise<LoginUserVo> {
+    const user = await this.userRepository.findOne({ where: { username: loginUserDto.username } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const isMatch = await bcrypt.compare(loginUserDto.password, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('Login failed');
+    }
+    const payload = {
+      userName: user.username,
+      userId: user.id,
+    }
+    const token = this.jwtService.sign(payload);
+    const rs = new LoginUserVo();
+    rs.elements = {
+      user: user,
+      token: token
+    }
+    rs.message = 'Login successful';
+    rs.success = true;
+    return rs;
+  }
+
+  getProfile(userId: number) {
+    return 'This action returns the profile of user with id: ' + userId;
   }
 
   findAll() {

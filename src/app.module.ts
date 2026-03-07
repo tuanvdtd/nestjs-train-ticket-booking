@@ -9,6 +9,8 @@ import { DbModule } from './db/db.module';
 import { StockTestTypeormModule } from './stock-test-typeorm/stock-test-typeorm.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockTestTypeorm } from './stock-test-typeorm/entities/stock-test-typeorm.entity';
+import { User } from './user/entities/user.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -20,10 +22,15 @@ import { StockTestTypeorm } from './stock-test-typeorm/entities/stock-test-typeo
       username: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '123456',
       database: process.env.DB_NAME || 'train_ticket',
-      entities: [StockTestTypeorm],
+      entities: [StockTestTypeorm, User],
       synchronize: true,
       logging: true,
       migrations: []
+    }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET || 'secret-jwt-key-nestjs-train-ticket-booking-123',
+      signOptions: { expiresIn: '1h' },
     })
   ],
   controllers: [AppController],
