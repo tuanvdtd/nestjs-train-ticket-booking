@@ -99,4 +99,20 @@ export class UserService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  async findUserAndPermissionById(userId: number) {
+    const foundUser = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: {
+        roles: {
+          permissions: true,
+        },
+      }, 
+    });
+    const permissions = foundUser?.roles.reduce((acc, role) => {
+      return [...acc, ...role.permissions];
+    }, []);
+    // trả về danh sách mảng permission name, không bị trùng lặp nếu 1 user có nhiều role có cùng permission
+    return [...new Set(permissions?.map(permission => permission.name))];
+  }
 }

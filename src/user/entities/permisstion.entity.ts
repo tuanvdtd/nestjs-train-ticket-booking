@@ -12,8 +12,5 @@ export class Permission {
   name: string;
 
   @Column()
-  createdAt: Date;
-
-  @Column()
-  updatedAt: Date;
+  nameCode: string;
 }

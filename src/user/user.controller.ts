@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MyLogger } from 'src/log/mylogger';
 import { LoginGuard } from './login.guard';
+import { IsPublic } from 'src/common/login-decorator';
 
 
 @Controller('user')
@@ -16,6 +17,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('register')
+  @IsPublic()
   register(@Body() registerUserDto: RegisterUserDto) {
     this.logger.log('Registering user', 'UserController');
     console.log(registerUserDto);
@@ -24,6 +26,7 @@ export class UserController {
 
   //login
   @Post('login')
+  @IsPublic()
   login(@Body() loginUserDto: LoginUserDto) {
     this.logger.log('User login attempt', 'UserController');
     console.log(loginUserDto);

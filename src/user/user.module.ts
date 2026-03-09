@@ -21,5 +21,6 @@ import { LoginGuard } from './login.guard';
       useClass: LoginGuard,
     },
   ],
+  exports: [UserService],
 })
 export class UserModule {}
