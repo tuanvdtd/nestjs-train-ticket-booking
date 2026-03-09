@@ -11,6 +11,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockTestTypeorm } from './stock-test-typeorm/entities/stock-test-typeorm.entity';
 import { User } from './user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { Role } from './user/entities/role.entity';
+import { Permission } from './user/entities/permisstion.entity';
+import { AdminModule } from './admin/admin.module';
+import { APP_GUARD } from '@nestjs/core';
+import { LoginGuard } from './user/login.guard';
+import { RbacGuard } from './user/rbac.guard';
 
 @Module({
   imports: [
@@ -22,7 +28,7 @@ import { JwtModule } from '@nestjs/jwt';
       username: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '123456',
       database: process.env.DB_NAME || 'train_ticket',
-      entities: [StockTestTypeorm, User],
+      entities: [StockTestTypeorm, User, Role, Permission],
       synchronize: true,
       logging: true,
       migrations: []
@@ -31,7 +37,8 @@ import { JwtModule } from '@nestjs/jwt';
       global: true,
       secret: process.env.JWT_SECRET || 'secret-jwt-key-nestjs-train-ticket-booking-123',
       signOptions: { expiresIn: '1h' },
-    })
+    }),
+    AdminModule
   ],
   controllers: [AppController],
   providers: [
@@ -47,6 +54,14 @@ import { JwtModule } from '@nestjs/jwt';
       provide: 'guard-provider',
       useClass: TestGuardGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: LoginGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RbacGuard,
+    }
   ],
   /*
   - imports: Đây là nơi bạn khai báo các module khác mà module này phụ thuộc vào. Trong trường hợp này, AppModule phụ thuộc vào OrderModule, 
